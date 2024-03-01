@@ -1,4 +1,4 @@
-*Please do not use this script, although it works, it is still sometimes ineffective.*
+*Please do not use this script, although it works, it is still ineffective most of the time.*
 # escape-compression
 Simple file compression
 
