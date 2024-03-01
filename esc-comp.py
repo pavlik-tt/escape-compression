@@ -31,7 +31,6 @@ def decompress(s, byte: bool = False):
 def compress(s):
     result = ''
     headers = []
-
     def remove_repeating(st):
         lists = list(st)
         removed = {}
@@ -48,7 +47,6 @@ def compress(s):
             else:
                 removed[start] = [c, 2]
         return lists, removed
-
     generate_esc = lambda char, index, n: "\033[{};{};{}]".format(char, index, n)
     repeated = remove_repeating(s)
     if len(repeated[1]) < 1:
@@ -73,7 +71,7 @@ def compress(s):
     for i in range(len(headers)):
         if '\x1d' not in kkk:
             break
-        headers[i][1] = kkk.index('\x00')
+        headers[i][1] = kkk.index('\x1d')
         kkk[kkk.index('\x1d')] = None
     newheaders = []
     for i in headers:
