@@ -1,6 +1,6 @@
-def decode(s, byte: bool = False):
+def decompress(s, byte: bool = False):
     if s[:6] != 'ESCCMP':
-        raise Exception("This file doesn't look like an ESC archive.")
+        raise Exception("This file doesn't look like an ESC file.")
     result = ''
     rawheaders = s[1:].split('\002')[0].split('\034')
     headers = {}
@@ -28,7 +28,7 @@ def decode(s, byte: bool = False):
     return result
 
 
-def repetitions(s, split: str = ''):
+def compress(s):
     result = ''
     headers = []
 
