@@ -7,11 +7,11 @@ Simple file compression
 ```python
 import esc_comp
 very_long_string = "..."
-not_very_long_string = esc_comp.repetitions(very_long_string)
+not_very_long_string = esc_comp.compress(very_long_string)
 ```
 **Decompressing:**
 ```python
 import esc_comp
 not_very_long_string = "..."
-very_long_string = esc_comp.decode(not_very_long_string)
+very_long_string = esc_comp.compress(not_very_long_string)
 ```
