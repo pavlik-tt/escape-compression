@@ -2,7 +2,6 @@ def decompress(s, byte: bool = False):
     invalid = False
     if s[:6] != 'ESCCMP':
         raise Exception("This file doesn't look like an ESC file.")
-    result = ''
     if '\002' not in s:
         raise Exception("This file doesn't look like an ESC file.")
     if '\034' not in s:
@@ -12,6 +11,7 @@ def decompress(s, byte: bool = False):
     text = s[1:].split('\002')[1]
     if len(rawheaders) < 1 and '\x00' in text:
         raise Exception("There are no headers in the string.")
+    result = ''
     for i in rawheaders:
         esc = i
         if ('[' not in esc) or (']' not in esc):
@@ -27,7 +27,7 @@ def decompress(s, byte: bool = False):
             continue
         try:
             char, index, n = esc[:3]
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             invalid = True
             break
         try:
@@ -57,7 +57,7 @@ def decompress(s, byte: bool = False):
                 break
             try:
                 char, n = esc
-            except TypeError, ValueError:
+            except (TypeError, ValueError):
                 invalid = True
                 break
             result += char * n
@@ -68,7 +68,9 @@ def decompress(s, byte: bool = False):
     return result
 
 
-def compress(s):
+def compress(s, mode="escape"):
+    if mode not in ('py_format', 'escape'):
+        raise ValueError('`mode` can be only \'escape\' or \'py_format\'')
     result = ''
     headers = []
     def remove_repeating(st):
@@ -88,6 +90,7 @@ def compress(s):
                 removed[start] = [c, 2]
         return lists, removed
     generate_esc = lambda char, index, n: "\033[{};{};{}]".format(char, index, n)
+    generate_pformat = lambda char, n: "{"+repr(chr(char))+"*"+str(n)+"}"
     repeated = remove_repeating(s)
     if len(repeated[1]) < 1:
         return False
@@ -99,24 +102,35 @@ def compress(s):
                 not_none = False
                 char = repeated[1][c]
                 repeatedc = char[0]
-                if char[1] > len(generate_esc(ord(char[0]), c, char[1])):
-                    headers.append([ord(char[0]), c, char[1]])
-                    result += '\x1d'
+                if mode == 'escape':
+                    if char[1] > len(generate_esc(ord(char[0]), c, char[1])):
+                        headers.append([ord(char[0]), c, char[1]])
+                        result += '\x1d'
+                    else:
+                        result += char[0] * char[1]
+                elif mode == 'py_format':
+                    if char[1] > len(generate_pformat(ord(char[0]), char[1])):
+                        result += generate_pformat(ord(char[0]), char[1])
+                    else:
+                        result += char[0] * char[1]
                 else:
-                    result += char[0] * char[1]
+                    raise ValueError('`mode` can be only \'escape\' or \'py_format\'')
             continue
         not_none = True
         result += i
-    kkk = list(result)
-    for i in range(len(headers)):
-        if '\x1d' not in kkk:
-            break
-        headers[i][1] = kkk.index('\x1d')
-        kkk[kkk.index('\x1d')] = None
-    newheaders = []
-    for i in headers:
-        newheaders.append(generate_esc(*i))
-    headers = newheaders
-    if len(headers) < 1:
-        return False
-    return "ESCCMP\001" + "\034".join(headers) + "\002" + result
+    if mode == 'escape':
+        kkk = list(result)
+        for i in range(len(headers)):
+            if '\x1d' not in kkk:
+                break
+            headers[i][1] = kkk.index('\x1d')
+            kkk[kkk.index('\x1d')] = None
+        newheaders = []
+        for i in headers:
+            newheaders.append(generate_esc(*i))
+        headers = newheaders
+        if len(headers) < 1:
+            return False
+        return "ESCCMP\001" + "\034".join(headers) + "\002" + result
+    else:
+        return 'f' + repr(result)
