@@ -1,30 +1,70 @@
 def decompress(s, byte: bool = False):
+    invalid = False
     if s[:6] != 'ESCCMP':
         raise Exception("This file doesn't look like an ESC file.")
     result = ''
+    if '\002' not in s:
+        raise Exception("This file doesn't look like an ESC file.")
+    if '\034' not in s:
+        raise Exception("This file doesn't look like an ESC file.")
     rawheaders = s[1:].split('\002')[0].split('\034')
     headers = {}
     text = s[1:].split('\002')[1]
+    if len(rawheaders) < 1 and '\x00' in text:
+        raise Exception("There are no headers in the string.")
     for i in rawheaders:
         esc = i
+        if ('[' not in esc) or (']' not in esc):
+            invalid = True
+            break
+        if ';' not in esc:
+            invalid = True
+            break
         esc = esc[esc.find('[') + 1:esc.find(']')]
         esc = esc.split(';')
         if len(esc) <= 1:
+            invalid = True
             continue
-        char, index, n = esc[:3]
-        char, index, n = int(char), int(index), int(n)
-        headers[index] = (chr(char), n)
+        try:
+            char, index, n = esc[:3]
+        except TypeError, ValueError:
+            invalid = True
+            break
+        try:
+            char = int(char)
+            index = int(index)
+            n = int(n)
+        except ValueError:
+            invalid = True
+            break
+        try:
+            headers[index] = (chr(char), n)
+        except ValueError:
+            invalid = True
+            break
+    if invalid:
+        raise Exception("This file doesn't look like an ESC file.")
     skip = 0
     for i, c in enumerate(text):
         if skip:
             skip -= 1
             continue
         if c == '\x00':
-            esc = headers[i]
-            char, n = esc
+            try:
+                esc = headers[i]
+            except KeyError:
+                invalid = True
+                break
+            try:
+                char, n = esc
+            except TypeError, ValueError:
+                invalid = True
+                break
             result += char * n
             continue
         result += c
+    if invalid:
+        raise Exception("This file doesn't look like an ESC file.")
     return result
 
 
