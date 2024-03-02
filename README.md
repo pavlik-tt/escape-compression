@@ -4,7 +4,7 @@ Simple file compression
 
 ### Cons:
 - Doesn't support bytes
-- Finds only repeating characters. (so `'HelloHelloHello'` won't work, but 'HHHHHHHHHHHHHHH' will)
+- Finds only repeating characters. (so `'HelloHelloHello'` won't work, but `'HHHHHHHHHHHHHHH'` will)
 
 ## Usage
 **Compressing:**
