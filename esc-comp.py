@@ -1,12 +1,17 @@
 def decompress(s):
     invalid = False
-    if s[:6] != 'ESCCMP' or '\002' not in s or '\034' not in s:
+    problematic_index = -1  # Everything is okay
+    if s[:6] != 'ESCCMP':
         raise Exception("This file doesn't look like an ESC file.")
+    if '\x02' not in s:
+        raise Exception("This file doesn't have an start of heading byte. (\\x02)")
+    if '\x1c' not in s:
+        raise Exception("This file doesn't have an file separator byte. (\\x1c)")
     rawheaders = s[1:].split('\002')[0].split('\034')
     headers = {}
     text = s[1:].split('\002')[1]
     if len(rawheaders) < 1 and '\x00' in text:
-        raise Exception("There are no headers in the string.")
+        raise Exception("There are no headers in the file.")
     result = ''
     for i in rawheaders:
         esc = i
@@ -39,8 +44,9 @@ def decompress(s):
             invalid = True
             break
     if invalid:
-        raise Exception("This file doesn't look like an ESC file.")
+        raise Exception("Invalid headers.")
     skip = 0
+    error_message = ""
     for i, c in enumerate(text):
         if skip:
             skip -= 1
@@ -49,20 +55,32 @@ def decompress(s):
             try:
                 esc = headers[i]
             except KeyError:
+                problematic_index = i
                 invalid = True
+                error_message = "There is no header for index {}".format(i)
                 break
             try:
                 char, n = esc
-            except (TypeError, ValueError):
+            except (TypeError, ValueError) as e:
+                problematic_index = i
                 invalid = True
+                if type(e) is TypeError:
+                    error_message = "Something went wrong when parsing headers."
+                elif type(e) is ValueError:
+                    error_message = "This header doesn't contain some of the required values. (ASCII code, index, number)"
                 break
             result += char * n
             continue
         result += c
     if invalid:
-        raise Exception("This file doesn't look like an ESC file.")
+        raise Exception("Something went wrong when decompressing the file. (problem at index: {})\nError:\n\n{}".format(problematic_index, error_message))
     return result
 
+if __name__ == '__main__':
+    with open('compressed.esc', 'wb') as file:
+        file.write(decompress('ESCCMP\x01\x1b[56;0;100000]\x02\x1d'.encode()))
+    print('Compressed file: compressed.esc')
+    exit()
 
 def compress(s, mode="escape"):
     if mode not in ('py_format', 'escape'):
