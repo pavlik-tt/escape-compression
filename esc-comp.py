@@ -1,4 +1,4 @@
-def decompress(s, byte: bool = False):
+def decompress(s):
     invalid = False
     if s[:6] != 'ESCCMP' or '\002' not in s or '\034' not in s:
         raise Exception("This file doesn't look like an ESC file.")
