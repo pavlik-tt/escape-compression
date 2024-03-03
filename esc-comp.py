@@ -1,10 +1,6 @@
 def decompress(s, byte: bool = False):
     invalid = False
-    if s[:6] != 'ESCCMP':
-        raise Exception("This file doesn't look like an ESC file.")
-    if '\002' not in s:
-        raise Exception("This file doesn't look like an ESC file.")
-    if '\034' not in s:
+    if s[:6] != 'ESCCMP' or '\002' not in s or '\034' not in s:
         raise Exception("This file doesn't look like an ESC file.")
     rawheaders = s[1:].split('\002')[0].split('\034')
     headers = {}
