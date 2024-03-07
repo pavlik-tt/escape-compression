@@ -24,7 +24,7 @@ def compress_words(s):
         stripped = c.strip(p)
         if stripped in already_passed:
             formatted = idk_how_to_name_this(c, stripped).format('\x00')
-            result.append()
+            result.append(formatted)
             #           idk if this is gonna work
             repetitions[i+formatted.find('\x00')] = already_passed.index(stripped)
             continue
