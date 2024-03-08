@@ -28,7 +28,7 @@ Example:
 Example #2:
 ```python
 >>> short_string = 'aaa'
->>> esc_comp.compress(very_long_string)
+>>> esc_comp.compress(short_string)
 False
 ```
 False means that compressing this text in this way is ineffective.
