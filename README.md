@@ -8,7 +8,7 @@ Simple text compression
 - Finds only repeating characters. (so `'HelloHelloHello'` won't work, but `'HHHHHHHHHHHHHHH'` will)
 
 ### Coming soon:
-- Finding repeated words (For example, `"Around the world, around the world\nAround the world, around the world"` will be compressed to `"Around the world, *0* *1* *2*\n*0* *1* *2*, *0* *1* *2*"`)
+- [Finding repeated words (For example, `"Around the world, around the world\nAround the world, around the world"` will be compressed to `"Around the world, *0* *1* *2*\n*0* *1* *2*, *0* *1* *2*"`)](https://github.com/pavlik-tt/escape-compression/issues/1)
 - Huffman tree (probably?)
 - Finding duplicate bytes regardless of size (for example, `'HHHHHHHHHHHHHHH'` will work, and `'HelloHelloHello'` will too)
 
