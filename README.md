@@ -1,6 +1,6 @@
 *Please do not use this script, although it works, it is still ineffective most of the time.*
-
-# escape-compression
+*For different versions of the script, [look here](branches.md)*
+# ESC compression
 Simple text compression
 
 ### Cons:
