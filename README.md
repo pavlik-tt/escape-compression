@@ -32,6 +32,7 @@ Example #2:
 False
 ```
 False means that compressing this text in this way is ineffective.
+
 **Decompressing:**
 ```python
 esc_comp.decompress(not_very_long_string)
