@@ -25,6 +25,13 @@ Example:
 >>> not_very_long_string
 'ESCCMP\x01\x1b[42;0;1000000]\x02\x1d'
 ```
+Example #2:
+```python
+>>> short_string = 'aaa'
+>>> esc_comp.compress(very_long_string)
+False
+```
+False means that compressing this text in this way is ineffective.
 **Decompressing:**
 ```python
 esc_comp.decompress(not_very_long_string)
